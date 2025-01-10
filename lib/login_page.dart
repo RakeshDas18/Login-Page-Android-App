@@ -89,6 +89,10 @@ class _LoginPageState extends State<LoginPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
+                        // Check if the email contains @example.com
+                        if (!value.endsWith('@gmail.com')) {
+                          return 'Please enter a valid email';
+                        }
                         return null;
                       },
                     ),
@@ -126,6 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password must be at least 8 characters';
                         }
                         return null;
                       },
