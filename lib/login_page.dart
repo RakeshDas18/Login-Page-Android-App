@@ -39,6 +39,41 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _signInWithEmailPassword() async {
+    try {
+      // Attempt to sign in with the email and password entered by the user
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: usernameController.text,
+        password: passwordController.text,
+      );
+
+      // If login is successful, show a success message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in successfully!')));
+
+      // You can navigate to another page if login is successful (e.g., home page)
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
+
+    } on FirebaseAuthException catch (e) {
+      // Log the error for debugging
+      print('FirebaseAuthException: ${e.code}');
+      print('Error message: ${e.message}');
+
+      // Handle FirebaseAuthException errors
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No user found for that email.')));
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Incorrect password.')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+      }
+    } catch (e) {
+      // Handle general errors
+      print('General error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred. Please try again later.')));
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: usernameController,
                       decoration: InputDecoration(
-                        hintText: "example@email.com",
+                        hintText: "example@gmail.com",
                         hintStyle: TextStyle(fontSize: 12),
                         contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                         border: OutlineInputBorder(
@@ -141,7 +176,8 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logging in...')));
+                          // Call the sign-in method if the form is valid
+                          _signInWithEmailPassword();
                         }
                       },
                       style: ElevatedButton.styleFrom(
