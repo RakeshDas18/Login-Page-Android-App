@@ -91,27 +91,38 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the screen width
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(screenWidth * 0.05),  // Adjust padding based on screen width
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Welcome back! 👋',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(
+                  fontSize: screenWidth * 0.08, // Dynamic font size
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: screenHeight * 0.05),
               Text(
                 "Please log in to continue",
-                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  color: Colors.grey[600],
+                ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: screenHeight * 0.05),
               Form(
                 key: _formKey,
                 child: Column(
@@ -120,10 +131,13 @@ class _LoginPageState extends State<LoginPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Email',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04, // Dynamic font size
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 08),
+                    SizedBox(height: screenHeight * 0.01),
                     TextFormField(
                       controller: usernameController,
                       decoration: InputDecoration(
@@ -134,28 +148,29 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: screenWidth * 0.045), // Dynamic text size
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        // Use a broader regular expression to validate the email address
                         if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
                           return 'Enter a valid email address';
                         }
                         return null;
                       },
                     ),
-
-                    SizedBox(height: 20),
+                    SizedBox(height: screenHeight * 0.02),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Password',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04, // Dynamic font size
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 08),
+                    SizedBox(height: screenHeight * 0.01),
                     TextFormField(
                       controller: passwordController,
                       obscureText: !_isPasswordVisible,
@@ -177,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                       ),
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: screenWidth * 0.045), // Dynamic text size
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
@@ -188,16 +203,15 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: screenHeight * 0.05),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          // Call the sign-in method if the form is valid
                           _signInWithEmailPassword();
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
+                        minimumSize: Size(double.infinity, screenHeight * 0.06), // Dynamic button size
                         backgroundColor: Color(0xff162d3a),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -206,19 +220,19 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Text(
                         'Login',
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                        style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.w700),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: screenHeight * 0.01),
                     Center(
-                      child: Text("or sign in with", style: TextStyle(fontSize: 15)),
+                      child: Text("or sign in with", style: TextStyle(fontSize: screenWidth * 0.04)),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: screenHeight * 0.02),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         GestureDetector(
-                          onTap: _signInWithGoogle, // Trigger Google sign-in on tap
+                          onTap: _signInWithGoogle,
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                             decoration: BoxDecoration(
@@ -229,19 +243,19 @@ class _LoginPageState extends State<LoginPage> {
                               children: [
                                 Image.asset(
                                   'assets/google.png',
-                                  height: 35,
-                                  width: 35,
+                                  height: screenHeight * 0.05, // Adjust size dynamically
+                                  width: screenHeight * 0.05,
                                 ),
-                                SizedBox(width: 15),
+                                SizedBox(width: screenWidth * 0.03),
                                 Text(
                                   'Google',
-                                  style: TextStyle(fontSize: 15, color: Colors.white),
+                                  style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.white),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        SizedBox(width: 25),
+                        SizedBox(width: screenWidth * 0.06),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                           decoration: BoxDecoration(
@@ -252,20 +266,20 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               Image.asset(
                                 'assets/facebook.png',
-                                height: 35,
-                                width: 35,
+                                height: screenHeight * 0.05,
+                                width: screenHeight * 0.05,
                               ),
-                              SizedBox(width: 15),
+                              SizedBox(width: screenWidth * 0.03),
                               Text(
                                 'Facebook',
-                                style: TextStyle(fontSize: 15, color: Colors.white),
+                                style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.white),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: screenHeight * 0.03),
                     Center(
                       child: GestureDetector(
                         onTap: () {
@@ -276,12 +290,12 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               TextSpan(
                                 text: "Don't have an account? ",
-                                style: TextStyle(fontSize: 17, color: Colors.black),
+                                style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.black),
                               ),
                               TextSpan(
                                 text: "Sign Up",
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: screenWidth * 0.05,
                                   color: Colors.blue,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -300,4 +314,5 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
 }
