@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -34,24 +35,37 @@ class _LoginPageState extends State<LoginPage> {
 
       await _auth.signInWithCredential(credential);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in with Google!')));
+
+      // Navigate to HomePage on successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage()),
+      );
+
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
     }
   }
 
+
   Future<void> _signInWithEmailPassword() async {
     try {
       // Attempt to sign in with the email and password entered by the user
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: usernameController.text,
         password: passwordController.text,
       );
 
+
+
       // If login is successful, show a success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in successfully!')));
 
-      // You can navigate to another page if login is successful (e.g., home page)
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
+      // Navigate to HomePage on successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage()),
+      );
 
     } on FirebaseAuthException catch (e) {
       // Log the error for debugging
@@ -72,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred. Please try again later.')));
     }
   }
+
 
 
   @override
@@ -124,13 +139,14 @@ class _LoginPageState extends State<LoginPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        // Check if the email contains @example.com
-                        if (!value.endsWith('@gmail.com')) {
-                          return 'Please enter a valid email';
+                        // Use a broader regular expression to validate the email address
+                        if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
+                          return 'Enter a valid email address';
                         }
                         return null;
                       },
                     ),
+
                     SizedBox(height: 20),
                     Align(
                       alignment: Alignment.centerLeft,
