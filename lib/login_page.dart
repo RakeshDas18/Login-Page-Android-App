@@ -56,8 +56,6 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
 
-
-
       // If login is successful, show a success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in successfully!')));
 
@@ -66,26 +64,45 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(builder: (_) => HomePage()),
       );
-
     } on FirebaseAuthException catch (e) {
       // Log the error for debugging
       print('FirebaseAuthException: ${e.code}');
       print('Error message: ${e.message}');
 
       // Handle FirebaseAuthException errors
-      if (e.code == 'user-not-found') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No user found for that email.')));
-      } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Incorrect password.')));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+      String errorMessage = '';
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = 'No user found for that email.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Incorrect password.';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is not valid.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This user account has been disabled.';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Too many requests. Please try again later.';
+          break;
+        case 'network-request-failed':
+          errorMessage = 'Network error occurred. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = e.message ?? 'An unknown error occurred. Please try again later.';
       }
+
+      // Show the error message in a SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
     } catch (e) {
-      // Handle general errors
+      // Handle general errors (network, server errors)
       print('General error: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred. Please try again later.')));
     }
   }
+
 
 
 
