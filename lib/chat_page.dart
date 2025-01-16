@@ -17,7 +17,9 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();
-  ScrollController _scrollController = ScrollController(); // ScrollController added
+  ScrollController _scrollController = ScrollController();
+  bool _isSendButtonEnabled = false; // Track if send button is enabled
+
   List<Map<String, String>> _messages = [
     {'sender': 'bot', 'time': '02:10 PM', 'message': 'Hello Nice\nWelcome to LiveChat.\nI was made with COMPLIT.'},
     {'sender': 'user', 'time': '02:12 PM', 'message': 'Welcome'}
@@ -25,11 +27,38 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Scroll to the bottom when a new message is added
   void _scrollToBottom() {
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent, // Scroll to the bottom
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    // Scroll to the bottom of the ListView after the widget tree is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+
+  // Listen to changes in the text field and enable/disable the send button
+  void _onMessageChanged() {
+    setState(() {
+      _isSendButtonEnabled = _messageController.text.isNotEmpty;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listener to check changes in the text field
+    _messageController.addListener(_onMessageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Remove listener when widget is disposed
+    _messageController.removeListener(_onMessageChanged);
+    super.dispose();
   }
 
   @override
@@ -55,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              controller: _scrollController, // Attach ScrollController to ListView
+              controller: _scrollController,
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
@@ -127,8 +156,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(color: Color(0xFF006EFF), Icons.send),
-                  onPressed: () {
+                  icon: Icon(Icons.send),
+                  onPressed: _isSendButtonEnabled
+                      ? () {
                     setState(() {
                       _messages.add({
                         'sender': 'user',
@@ -137,9 +167,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       });
                     });
                     _messageController.clear();
-                    _scrollToBottom(); // Automatically scroll to the bottom
-                  },
-                  color: Color(0xFF006EFF),
+                    _scrollToBottom();
+                  }
+                      : null, // Disable the button if text is empty
+                  color: _isSendButtonEnabled ? Color(0xFF006EFF) : Colors.grey, // Change color based on enable/disable state
                   iconSize: 30,
                 ),
               ],
