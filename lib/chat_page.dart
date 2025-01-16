@@ -17,10 +17,20 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();
+  ScrollController _scrollController = ScrollController(); // ScrollController added
   List<Map<String, String>> _messages = [
     {'sender': 'bot', 'time': '02:10 PM', 'message': 'Hello Nice\nWelcome to LiveChat.\nI was made with COMPLIT.'},
     {'sender': 'user', 'time': '02:12 PM', 'message': 'Welcome'}
   ];
+
+  // Scroll to the bottom when a new message is added
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent, // Scroll to the bottom
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController, // Attach ScrollController to ListView
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
@@ -54,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.only(bottom: 15),
                   child: Align(
                     alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
-                    child: IntrinsicWidth( // Wrap the container with IntrinsicWidth
+                    child: IntrinsicWidth(
                       child: Container(
                         decoration: BoxDecoration(
                           color: isBot ? Colors.white : Color(0xFF006EFF),
@@ -68,13 +79,13 @@ class _ChatScreenState extends State<ChatScreen> {
                             Row(
                               mainAxisAlignment: isBot
                                   ? MainAxisAlignment.start
-                                  : MainAxisAlignment.end, // Align name/time based on sender
+                                  : MainAxisAlignment.end,
                               children: [
                                 Text(
-                                  isBot ? 'LiveChat' : 'Me', // Show 'LiveChat' for bot and 'Me' for user
+                                  isBot ? 'LiveChat' : 'Me',
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
                                 ),
-                                SizedBox(width: 15), // Adjust the gap size here
+                                SizedBox(width: 15),
                                 Text(
                                   message['time']!,
                                   style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -126,6 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       });
                     });
                     _messageController.clear();
+                    _scrollToBottom(); // Automatically scroll to the bottom
                   },
                   color: Color(0xFF006EFF),
                   iconSize: 30,
