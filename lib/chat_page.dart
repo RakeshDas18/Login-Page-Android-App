@@ -54,27 +54,40 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.only(bottom: 15),
                   child: Align(
                     alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isBot ? Colors.white : Color(0xFF006EFF),
-                        border: isBot ? Border.all(color: Color(0xFFE0E0E0)) : null,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.all(10),
-                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-                      child: Column(
-                        crossAxisAlignment: isBot ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            message['time']!,
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            message['message']!,
-                            style: TextStyle(fontSize: 14, color: isBot ? Colors.black : Colors.white),
-                          ),
-                        ],
+                    child: IntrinsicWidth( // Wrap the container with IntrinsicWidth
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isBot ? Colors.white : Color(0xFF006EFF),
+                          border: isBot ? Border.all(color: Color(0xFFE0E0E0)) : null,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: isBot ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisAlignment: isBot
+                                  ? MainAxisAlignment.start
+                                  : MainAxisAlignment.end, // Align name/time based on sender
+                              children: [
+                                Text(
+                                  isBot ? 'LiveChat' : 'Me', // Show 'LiveChat' for bot and 'Me' for user
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
+                                ),
+                                SizedBox(width: 15), // Adjust the gap size here
+                                Text(
+                                  message['time']!,
+                                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              message['message']!,
+                              style: TextStyle(fontSize: 14, color: isBot ? Colors.black : Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
