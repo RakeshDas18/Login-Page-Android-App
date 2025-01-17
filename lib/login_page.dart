@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'home_page.dart';
 import 'styles.dart';  // Import the styles file
+import 'signup_page.dart'; // Import the SignUpPage file
 
 class LoginPage extends StatefulWidget {
   @override
@@ -37,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
       await _auth.signInWithCredential(credential);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in with Google!')));
 
-      // Navigate to HomePage on successful login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => HomePage()),
@@ -245,7 +245,10 @@ class _LoginPageState extends State<LoginPage> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          // Navigate to Sign Up page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => SignUpPage()),  // Navigate to SignUpPage
+                          );
                         },
                         child: RichText(
                           text: TextSpan(
