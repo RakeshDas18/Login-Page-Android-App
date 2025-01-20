@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';  // Import the LoginPage to navigate back to the login screen.
 
 class ChatApp extends StatelessWidget {
   @override
@@ -18,16 +20,14 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();
   ScrollController _scrollController = ScrollController();
-  bool _isSendButtonEnabled = false; // Track if send button is enabled
+  bool _isSendButtonEnabled = false;
 
   List<Map<String, String>> _messages = [
     {'sender': 'bot', 'time': '02:10 PM', 'message': 'Hello Nice\nWelcome to LiveChat.\nI was made with COMPLIT.'},
     {'sender': 'user', 'time': '02:12 PM', 'message': 'Welcome'}
   ];
 
-  // Scroll to the bottom when a new message is added
   void _scrollToBottom() {
-    // Scroll to the bottom of the ListView after the widget tree is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -39,8 +39,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-
-  // Listen to changes in the text field and enable/disable the send button
   void _onMessageChanged() {
     setState(() {
       _isSendButtonEnabled = _messageController.text.isNotEmpty;
@@ -50,16 +48,74 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Add listener to check changes in the text field
     _messageController.addListener(_onMessageChanged);
   }
 
   @override
   void dispose() {
-    // Remove listener when widget is disposed
     _messageController.removeListener(_onMessageChanged);
     super.dispose();
   }
+
+  // Show a logout dialog or action when tapped
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                 // Dismiss the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform logout action here
+                try {
+                  FirebaseAuth.instance.signOut();  // Sign out from Firebase
+
+                  // Show the SnackBar before navigating
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Logged out successfully')),
+                  );
+
+                  // Delay the navigation to the login page after SnackBar is shown
+                  Future.delayed(Duration(seconds: 2), () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginPage()),
+                    );
+                  });
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Logout failed: $e')),
+                  );
+                }
+                Navigator.of(context).pop();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logged out successfully')),
+                );
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                );
+
+
+              },
+              child: Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +133,28 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
             icon: Icon(Icons.thumb_down),
             onPressed: () {},
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'logout') {
+                _showLogoutDialog(); // Show logout dialog
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.exit_to_app, color: Colors.black),
+                      SizedBox(width: 10),
+                      Text('Logout'),
+                    ],
+                  ),
+                ),
+              ];
+            },
+            icon: Icon(Icons.more_vert), // The 3-dot menu icon
           ),
         ],
       ),
@@ -169,8 +247,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     _messageController.clear();
                     _scrollToBottom();
                   }
-                      : null, // Disable the button if text is empty
-                  color: _isSendButtonEnabled ? Color(0xFF006EFF) : Colors.grey, // Change color based on enable/disable state
+                      : null,
+                  color: _isSendButtonEnabled ? Color(0xFF006EFF) : Colors.grey,
                   iconSize: 30,
                 ),
               ],
